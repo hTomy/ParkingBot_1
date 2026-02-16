@@ -1,0 +1,6 @@
+llama-index
+llama-index-llms-openai 
+llama-index-readers-database 
+psycopg2
+llama-index-core
+weaviate-client
