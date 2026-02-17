@@ -1,2 +1,4 @@
 .env
 .idea
+/db_setup/pgdata
+/db_setup/weaviate_data

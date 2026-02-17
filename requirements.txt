@@ -1,6 +1,13 @@
 llama-index
-llama-index-llms-openai 
-llama-index-readers-database 
+llama-index-llms-openai
+llama-index-vector-stores-weaviate
+llama-index-readers-database
+psycopg2-binary
+sqlalchemy
 psycopg2
 llama-index-core
 weaviate-client
+langchain-community
+langchain-openai
+langchain-core
+langchain

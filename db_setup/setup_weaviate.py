@@ -1,30 +1,34 @@
 import weaviate
-from weaviate.classes.config import Configure
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, Settings
+from llama_index.vector_stores.weaviate import WeaviateVectorStore
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.openai import OpenAI
+from llama_index.core.node_parser import TokenTextSplitter
 
 if __name__ == '__main__':
+    Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+    Settings.llm = OpenAI(model="gpt-4o-mini")
+
+    documents = SimpleDirectoryReader(input_dir="docs").load_data()
 
     with weaviate.connect_to_local() as client:
-        client.collections.create(
-            name="MovieOpen",
-            vector_config=Configure.Vectors.text2vec_openai(),  # Configure the Weaviate Embeddings vectorizer
+
+        vector_store = WeaviateVectorStore(
+            weaviate_client=client,
+            index_name="ParkingDocs",
+            text_key="text",
         )
 
+        storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
-        data_objects = [
-            {"title": "The Matrix",
-             "description": "A computer hacker learns about the true nature of reality and his role in the war against its controllers.",
-             "genre": "Science Fiction"},
-            {"title": "Spirited Away",
-             "description": "A young girl becomes trapped in a mysterious world of spirits and must find a way to save her parents and return home.",
-             "genre": "Animation"},
-            {"title": "The Lord of the Rings: The Fellowship of the Ring",
-             "description": "A meek Hobbit and his companions set out on a perilous journey to destroy a powerful ring and save Middle-earth.",
-             "genre": "Fantasy"},
-        ]
+        index = VectorStoreIndex.from_documents(
+            documents,
+            storage_context=storage_context,
+            transformations=[TokenTextSplitter(chunk_size=80, chunk_overlap=20)], # Sentence splitter was creating 1-2 chunks only
+        )
 
-        movies = client.collections.use("MovieOpen")
-        with movies.batch.fixed_size(batch_size=200) as batch:
-            for obj in data_objects:
-                batch.add_object(properties=obj)
+        query_engine = index.as_query_engine(similarity_top_k=3)
 
-        print(f"Imported & vectorized {len(movies)} objects into the Movie collection")
+        #Testing
+        resp = query_engine.query("What are the working hours and how do I enter?")
+        print(str(resp))
