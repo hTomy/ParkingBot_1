@@ -16,5 +16,3 @@ def run_parking_agent():
 
 if __name__ == "__main__":
     run_parking_agent()
-
-    # evidently_api_key = "sk_prod.019c7a6e-883c-7563-9430-8fde96ac008e.iJKzazFHr881m5FBk8bqQRFltnn3G-z4515QrLIyJop0r2WjniPzq1Vu3I22bzWl6IthijNxQ1asn98OooPx-f6_KQkP9_8n_zkMUMZSCd9A3LbIlpAjYl4wyEC26ZRa"

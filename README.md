@@ -44,25 +44,9 @@ OPENAI_API_KEY=<your_openai_key>
 
 ---
 
-## 🗄️ Database & Infrastructure Setup (Docker)
-
-Navigate to the `db_setup` directory and start required services:
-
-```bash
-docker-compose up -d
-```
-
-This will launch:
-
-* Weaviate vector database
-* PostgreSQL database
-* Supporting services
-
----
-
 ## 🐍 Python Environment Setup
 
-Create a virtual environment:
+In project root create a virtual environment:
 
 ```bash
 python -m venv .venv
@@ -86,6 +70,32 @@ Install dependencies:
 
 ```bash
 pip install -r requirements.txt
+```
+
+---
+
+## 🗄️ Database & Infrastructure Setup (Docker)
+
+Navigate to the `db_setup` directory and start required services:
+
+```bash
+docker-compose up -d
+```
+
+This will launch:
+
+* Weaviate vector database
+* PostgreSQL database
+* Supporting services
+
+After it has started run the init scripts:
+
+```bash
+python setup_postgres.py
+```
+
+```bash
+python setup_weaviate.py
 ```
 
 ---
@@ -121,4 +131,10 @@ This script measures:
 * **Recall@K** – How many relevant chunks were successfully retrieved
 
 These metrics help tune chunking, embeddings, and retrieval parameters.
+
+---
+
+# Example usage
+
+<img src="img/example_usage.png">
 

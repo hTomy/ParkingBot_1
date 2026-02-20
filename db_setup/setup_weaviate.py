@@ -27,8 +27,4 @@ if __name__ == '__main__':
             transformations=[TokenTextSplitter(chunk_size=80, chunk_overlap=20)], # Sentence splitter was creating 1-2 chunks only
         )
 
-        query_engine = index.as_query_engine(similarity_top_k=3)
-
-        #Testing
-        resp = query_engine.query("What are the working hours and how do I enter?")
-        print(str(resp))
+        print(f"Weaviate setup complete.")

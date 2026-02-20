@@ -44,3 +44,5 @@ if __name__ == '__main__':
     conn.commit()
     cur.close()
     conn.close()
+
+    print(f"Postgres setup complete.")
