@@ -15,7 +15,8 @@ def book_parking_space(booking_info: BookingInfo):
         Example:
             book_parking_space(
                 booking_info=BookingInfo(
-                    licence_plate="ABC123",
+                    name="John Smith"
+                    license_plate="ABC123",
                     start_datetime=datetime.datetime(2025, 6, 7, 15, 00, 00),
                     end_datetime=datetime.datetime(2025, 6, 7, 16, 00, 00),
                     spot_number=15
@@ -23,15 +24,15 @@ def book_parking_space(booking_info: BookingInfo):
             )
             {
                 'status': 'success',
-                'message': 'Successfully booked a parking space at {booking_info.start_datetime} for {booking_info.licence_plate}'
-                "booking_id": "1234",
+                'message': 'Successfully booked a parking space for {booking_info.name} at {booking_info.start_datetime} for {booking_info.license_plate}'
             }
     """
     if booking_info.check_if_all_fields_present():
         try:
             return {
                 "status": "success",
-                "message": f"Successfully created booking for a parking space at {booking_info.start_datetime} for {booking_info.licence_plate}, please wait for confirmation from the admin.",
+                "message": f"Successfully booked a parking space for {booking_info.name} at {booking_info.start_datetime}, "
+                           f"parking space number: {booking_info.spot_number}. Please wait for confirmation from the admin.",
             }
         except Exception as e:
             return {
