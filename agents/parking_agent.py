@@ -50,6 +50,7 @@ class ParkingAgent:
 
 
 if __name__ == '__main__':
+    #Debug
     async def debug_run(app, text, config):
         async for event in app.astream_events(
                 {"messages": [HumanMessage(text)]},
