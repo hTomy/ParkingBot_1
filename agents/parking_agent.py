@@ -43,7 +43,7 @@ class ParkingAgent:
         ):
             yield msg.content
 
-    def invoke(self, message: str):
+    def invoke(self, message: str): # TODO convert this to async stream add logging
         out = self.graph.invoke({"messages": [HumanMessage(message)]}, self._config)
         final_ai = next(m for m in reversed(out["messages"]) if isinstance(m, AIMessage))
         return final_ai.content
