@@ -138,3 +138,67 @@ These metrics help tune chunking, embeddings, and retrieval parameters.
 
 <img src="img/example_usage.png">
 
+
+---
+
+# Task 2
+
+## Human-in-the-Loop & Admin API (new features)
+
+### New features
+
+- Added a REST API implemented with FastAPI to communicate with an administrator review workflow (`admin_api/server.py`).
+- Added Human-in-the-loop: after the agent gathers and confirms booking details, the booking is escalated to a human administrator for final confirmation.
+- Added `AdminAgent` (`agents/admin_agent.py`) to centralize admin API interactions. The booking tool uses the helper `create_task_and_wait` to create an admin task and block until the admin confirms or refuses the booking.
+
+### How it works
+
+1. The LangGraph/LangChain agent collects booking details from the user and calls the `book_parking_space` tool when information is complete.
+2. The `book_parking_space` tool creates an admin review task via the Admin REST API and waits synchronously for the admin decision.
+3. The admin inspects the task (via the API or UI) and resolves it with `confirm` or `refuse`.
+4. Once the admin resolves the task, the tool returns a final message to the agent and the agent informs the user of the confirmed/refused result.
+
+### Admin REST API — user endpoint reference
+
+- `GET /tasks/{task_id}`
+  - Purpose: fetch task details and status.
+  - Response JSON: task object with fields like `id`, `booking`, `metadata`, `status`, `resolution`, `created_at`, `updated_at`. When the admin resolves a task the `resolution` field will be present (e.g. `{ "decision": "confirm", "notes": "OK" }`).
+
+- `POST /tasks/{task_id}/resolve`
+  - Purpose: admin resolves (confirms/refuses) a pending task.
+  - Request JSON: `{ "decision": "confirm" | "refuse", "notes": "optional notes" }`
+  - Response JSON: updated task status (e.g. `{ "task_id": "<uuid>", "status": "confirm" }`).
+
+- `GET /tasks`
+  - Purpose: list tasks (default lists pending tasks). Returns an array of objects `{ id, created_at }`. For admin to see pending tasks.
+
+### Examples
+
+- Inspect a task (curl):
+
+```bash
+curl http://localhost:8001/tasks/<TASK_ID>
+```
+
+- Resolve a task (Windows PowerShell example)
+
+Replace `task_id` in the URL with the real id from `/tasks` endpoint:
+
+```powershell
+$body = @{
+  decision = "confirm"
+  notes    = "LGTM, go ahead with the booking."
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+  -Uri "http://localhost:8001/tasks/task_id/resolve" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+---
+
+# Example usage
+
+<img src="img/example_usage_task_2.png">

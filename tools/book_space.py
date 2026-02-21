@@ -11,6 +11,7 @@ def book_parking_space(booking_info: BookingInfo):
         Book an appointment with the given booking information. Confirm the given information with the customer before using this tool.
         After giving the start and end time you should select a random spot number that is free based on the SQL table.
         There are a total of 42 parking spots available with spot numbers 1-42.
+        Parking spots info can be found in 'parking_bookings' table.
 
         Args:
             booking_info (CustomerInfo): booking information to book a parking space.
