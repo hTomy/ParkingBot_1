@@ -4,7 +4,6 @@ from typing import Iterator
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph, MessagesState
-from langchain.chat_models import init_chat_model
 from langchain.agents import create_agent
 from langchain_core.messages import AIMessage, HumanMessage
 from tools.tools import tools
@@ -12,20 +11,19 @@ from utils import config
 from prompts import prompts
 import asyncio
 
+
 class ParkingAgent:
     def __init__(self, use_memory_checkpoint: bool = True):
         self.checkpointer = MemorySaver() if use_memory_checkpoint else None
 
-        # Subgraph: LangChain agent (tool loop included)
         self.parking_agent = create_agent(
-            model=init_chat_model(config.MODEL),
+            model=config.MODEL,
             tools=tools,
             system_prompt=prompts.PRIMARY_INSTRUCTION,
             checkpointer=self.checkpointer,   # optional; see notes below
             name="parking_agent",             # helps with subgraph scoping/debug
         )
 
-        # Parent graph
         builder = StateGraph(MessagesState)
         builder.add_node("parking_agent", self.parking_agent)
         builder.add_edge(START, "parking_agent")
@@ -35,15 +33,15 @@ class ParkingAgent:
         self._config = {"configurable": {"thread_id": str(uuid.uuid4())}}
 
     def invoke_stream(self, message: str) -> Iterator[str]:
-
+        # Yield both message content and meta events so callers can react to tool events
         for msg, meta in self.graph.stream(
             {"messages": [HumanMessage(message + " /no_think")]},
             self._config,
             stream_mode="messages",
         ):
-            yield msg.content
+            yield msg.content, meta
 
-    def invoke(self, message: str): # TODO convert this to async stream add logging
+    def invoke(self, message: str): # TODO add logging
         out = self.graph.invoke({"messages": [HumanMessage(message)]}, self._config)
         final_ai = next(m for m in reversed(out["messages"]) if isinstance(m, AIMessage))
         return final_ai.content
@@ -69,4 +67,6 @@ if __name__ == '__main__':
 
 
     agent = ParkingAgent(use_memory_checkpoint=True)
-    asyncio.run(debug_run(agent.graph, "what reservations are there for JKL321 licence plate?", agent._config))
+    asyncio.run(debug_run(agent.graph, "Hello my name is Tamas and I  want to make a reservation. "
+                                       "My license plate is RMS456 and time would be 2026-02-24 14:00 - 15:00",
+                          agent._config))

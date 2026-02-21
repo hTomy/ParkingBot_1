@@ -11,3 +11,10 @@ langchain-community
 langchain-openai
 langchain-core
 langchain
+fastapi
+uvicorn[standard]
+httpx
+pydantic
+python-dotenv
+pytest
+requests

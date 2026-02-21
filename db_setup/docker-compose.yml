@@ -1,4 +1,4 @@
-version: '3.4'
+#version: '3.4'
 services:
   weaviate:
     image: semitechnologies/weaviate:latest
@@ -12,8 +12,6 @@ services:
       - DEFAULT_VECTORIZER_MODULE=text2vec-openai
       - ENABLE_MODULES=text2vec-openai
       - OPENAI_APIKEY=${OPENAI_APIKEY}
-    volumes:
-      - ./weaviate_data:/var/lib/weaviate
       
   postgres:
     image: postgres:15
@@ -26,6 +24,21 @@ services:
       - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+
+  admin_api:
+    build:
+      context: ..
+      dockerfile: admin_api/Dockerfile
+    restart: always
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=parking_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
 
   pgadmin:
     image: dpage/pgadmin4
