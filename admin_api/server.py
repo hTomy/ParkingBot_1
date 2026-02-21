@@ -78,16 +78,3 @@ def list_tasks(status: str = "pending"):
         return []
     items = tasks_db.list_pending_tasks() if status == "pending" else []
     return items
-
-# powershell curl for confirming admin tasks
-
-# $body = @{
-#   decision = "confirm"
-#   notes    = "LGTM, go ahead with the booking."
-# } | ConvertTo-Json
-#
-# Invoke-RestMethod `
-#   -Uri "http://localhost:8001/tasks/task_id/resolve" `
-#   -Method POST `
-#   -ContentType "application/json" `
-#   -Body $body
