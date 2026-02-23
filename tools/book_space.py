@@ -57,6 +57,7 @@ def book_parking_space(booking_info: BookingInfo):
             decision = (res.get('decision') or '').lower()
             notes = res.get('notes')
             if decision in ('confirm', 'confirmed'):
+                requests.post("mcp_server, data.json")
                 return {"status": "confirmed", "message": f"Booking confirmed by admin. Notes: {notes or ''}"}
             else:
                 return {"status": "refused", "message": f"Booking refused by admin. Notes: {notes or ''}"}

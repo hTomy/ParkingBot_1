@@ -27,8 +27,7 @@ services:
 
   admin_api:
     build:
-      context: ..
-      dockerfile: admin_api/Dockerfile
+      dockerfile: servers/admin_server/Dockerfile
     restart: always
     environment:
       - POSTGRES_HOST=postgres
