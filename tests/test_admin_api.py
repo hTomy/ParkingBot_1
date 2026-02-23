@@ -2,7 +2,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 # Import the FastAPI app
-from admin_api import server
+from servers.admin_server import server
+
 
 # We'll monkeypatch the tasks_db module to avoid real Postgres in unit tests
 class FakeDB:

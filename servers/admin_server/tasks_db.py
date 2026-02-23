@@ -1,5 +1,4 @@
 import os
-import json
 import psycopg2
 from psycopg2.extras import Json
 from datetime import datetime, timezone
