@@ -1,5 +1,4 @@
 import uuid
-from typing import Iterator
 
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START, END
@@ -20,8 +19,8 @@ class ParkingAgent:
             model=config.MODEL,
             tools=tools,
             system_prompt=prompts.PRIMARY_INSTRUCTION,
-            checkpointer=self.checkpointer,   # optional; see notes below
-            name="parking_agent",             # helps with subgraph scoping/debug
+            checkpointer=self.checkpointer,
+            name="parking_agent",
         )
 
         builder = StateGraph(MessagesState)
@@ -32,19 +31,20 @@ class ParkingAgent:
         self.graph = builder.compile(checkpointer=self.checkpointer) if self.checkpointer else builder.compile()
         self._config = {"configurable": {"thread_id": str(uuid.uuid4())}}
 
-    def invoke_stream(self, message: str) -> Iterator[str]:
-        # Yield both message content and meta events so callers can react to tool events
-        for msg, meta in self.graph.stream(
-            {"messages": [HumanMessage(message + " /no_think")]},
+    async def ainvoke(self, message: str):
+        out = await self.graph.ainvoke({"messages": [HumanMessage(message)]}, self._config)
+
+        final_ai = next(m for m in reversed(out["messages"]) if isinstance(m, AIMessage))
+        return final_ai.content
+
+    async def astream(self, message: str):
+        async for msg, meta in self.graph.astream(
+            {"messages": [HumanMessage(message)]},
             self._config,
             stream_mode="messages",
         ):
-            yield msg.content, meta
-
-    def invoke(self, message: str): # TODO add logging
-        out = self.graph.invoke({"messages": [HumanMessage(message)]}, self._config)
-        final_ai = next(m for m in reversed(out["messages"]) if isinstance(m, AIMessage))
-        return final_ai.content
+            if isinstance(msg, AIMessage) and msg.content:
+                yield msg.content, meta
 
 
 if __name__ == '__main__':

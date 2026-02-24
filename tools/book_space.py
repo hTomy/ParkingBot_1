@@ -7,7 +7,8 @@ _admin_agent = AdminAgent(admin_api_url=config.ADMIN_API_URL)
 
 def book_parking_space(booking_info: BookingInfo):
     """
-        Book a parking space with the given booking information. Confirm the given information with the customer before using this tool.
+        Book a parking space with the given booking information, and confirm it with the admin.
+        Confirm the given information with the customer before using this tool.
         After giving the start and end time you should select a random spot number that is free based on the SQL table.
         There are a total of 42 parking spots available with spot numbers 1-42.
         Parking spots info can be found in 'parking_bookings' table.
@@ -30,7 +31,8 @@ def book_parking_space(booking_info: BookingInfo):
             )
             {
                 'status': 'success',
-                'message': 'Successfully booked a parking space for {booking_info.name} at {booking_info.start_datetime} for {booking_info.license_plate}'
+                'message': '"Booking confirmed by admin.'
+                'booking_info': booking_info
             }
     """
     if booking_info.check_if_all_fields_present():
@@ -58,7 +60,7 @@ def book_parking_space(booking_info: BookingInfo):
             decision = (res.get('decision') or '').lower()
             notes = res.get('notes')
             if decision in ('confirm', 'confirmed'):
-                return {"status": "confirmed", "message": f"Booking confirmed by admin. Notes: {notes or ''}"}
+                return {"status": "confirmed", "message": f"Booking confirmed by admin. Notes: {notes or ''}", "booking_info": booking_info}
             else:
                 return {"status": "refused", "message": f"Booking refused by admin. Notes: {notes or ''}"}
         except TimeoutError:

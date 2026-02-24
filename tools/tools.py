@@ -28,6 +28,4 @@ tools = [parking_kb_retrieve,
          *mcp_tools
         ]
 
-if __name__ == '__main__':
-    tools = asyncio.run(init_mcp_tools())
-    print(tools)
+
