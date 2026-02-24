@@ -2,13 +2,12 @@ from utils.booking_model import BookingInfo
 from utils import config
 from agents.admin_agent import AdminAgent
 
-# Use AdminAgent synchronous helper for escalation and waiting
 _admin_agent = AdminAgent(admin_api_url=config.ADMIN_API_URL)
 
 
 def book_parking_space(booking_info: BookingInfo):
     """
-        Book an appointment with the given booking information. Confirm the given information with the customer before using this tool.
+        Book a parking space with the given booking information. Confirm the given information with the customer before using this tool.
         After giving the start and end time you should select a random spot number that is free based on the SQL table.
         There are a total of 42 parking spots available with spot numbers 1-42.
         Parking spots info can be found in 'parking_bookings' table.
@@ -35,7 +34,7 @@ def book_parking_space(booking_info: BookingInfo):
             }
     """
     if booking_info.check_if_all_fields_present():
-        # Notify admin by creating an escalation task in the admin API (demo: unauthenticated)
+        # Notify admin by creating an escalation task in the admin API
         payload = {
             "booking": {
                 "name": booking_info.name,
@@ -50,6 +49,8 @@ def book_parking_space(booking_info: BookingInfo):
             # Create escalation and wait synchronously for admin decision via AdminAgent helper
             # The AdminAgent method will raise TimeoutError on timeout
             print("Booking requires admin confirmation, creating escalation task and waiting for resolution...\n")
+
+            # result_task = {'resolution': {'decision': 'confirm', 'notes': 'Looks good, confirming the booking!'}} # Mock result for testing without admin API
             result_task = _admin_agent.create_task_and_wait(payload)
 
             # At this point, the admin has resolved the task and result_task contains resolution
@@ -57,7 +58,6 @@ def book_parking_space(booking_info: BookingInfo):
             decision = (res.get('decision') or '').lower()
             notes = res.get('notes')
             if decision in ('confirm', 'confirmed'):
-                requests.post("mcp_server, data.json")
                 return {"status": "confirmed", "message": f"Booking confirmed by admin. Notes: {notes or ''}"}
             else:
                 return {"status": "refused", "message": f"Booking refused by admin. Notes: {notes or ''}"}
