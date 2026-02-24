@@ -202,3 +202,24 @@ Invoke-RestMethod `
 # Example usage
 
 <img src="img/example_usage_task_2.png">
+
+---
+
+# Task 3
+
+## MCP Server (persist bookings to file)
+
+Summary of changes
+
+- Added `servers/mcp_server/` : an MCP server that exposes tools.
+  - `confirmed_bookings.csv` — CSV file where confirmed bookings are appended.
+  - `Dockerfile` + `requirements.txt` for containerization and dependencies.
+- Updated `docker-compose.yml` to add the `mcp_server` service so it runs together with the rest of the stack.
+- Updated the agent wiring so `ParkingAgent` includes MCP-related tools.
+- Updated `main.py` to use the async agent API (`ainvoke` / `astream`) so the graph can call async tools without blocking.
+
+# Example usage
+
+<img src="img/example_usage_task_3.png">
+
+

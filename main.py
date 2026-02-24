@@ -1,18 +1,22 @@
 from agents.parking_agent import ParkingAgent
+import asyncio
 
 agent = ParkingAgent()
 
-def run_parking_agent():
-    for msg in agent.invoke("Hello"):
-        print(msg, end="")
+async def run_parking_agent():
+    res = await agent.ainvoke("Hello")
+    print(res)
 
     while True:
         print("\n-------------------------")
         user_input = input("Chat (q to quit): ").strip()
         if user_input == "q":
             break
-        for msg in agent.invoke(user_input):
-            print(msg, end="")
+
+        async for content, meta in agent.astream(user_input):
+            print(content)
+
 
 if __name__ == "__main__":
-    run_parking_agent()
+    asyncio.run(run_parking_agent())
+

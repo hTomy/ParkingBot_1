@@ -6,7 +6,7 @@ psycopg2-binary
 sqlalchemy
 psycopg2
 llama-index-core
-weaviate-client
+weaviate-client==4.19.3
 langchain-community
 langchain-mcp-adapters
 langchain-openai
@@ -19,4 +19,5 @@ pydantic
 python-dotenv
 pytest
 requests
-mcp
+mcp==1.22.0
+fastmcp
