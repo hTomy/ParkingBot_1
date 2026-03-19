@@ -1,7 +1,9 @@
 from agents.parking_agent import ParkingAgent
 import asyncio
 
+
 agent = ParkingAgent()
+
 
 async def run_parking_agent():
     res = await agent.ainvoke("Hello")
@@ -15,6 +17,7 @@ async def run_parking_agent():
 
         async for content, meta in agent.astream(user_input):
             print(content)
+
 
 
 if __name__ == "__main__":

@@ -1,74 +1,47 @@
 from utils.booking_model import BookingInfo
-from utils import config
-from agents.admin_agent import AdminAgent
-
-_admin_agent = AdminAgent(admin_api_url=config.ADMIN_API_URL)
 
 
-def book_parking_space(booking_info: BookingInfo):
+def submit_booking_request(booking_info: BookingInfo) -> dict:
     """
-        Book a parking space with the given booking information, and confirm it with the admin.
+        Submit a parking booking request for admin approval.
         Confirm the given information with the customer before using this tool.
         After giving the start and end time you should select a random spot number that is free based on the SQL table.
         There are a total of 42 parking spots available with spot numbers 1-42.
         Parking spots info can be found in 'parking_bookings' table.
 
+        This tool does NOT finalize the booking. It submits the request for admin review.
+        The admin will approve or refuse the booking in a subsequent step.
+
         Args:
-            booking_info (CustomerInfo): booking information to book a parking space.
+            booking_info (BookingInfo): booking information to submit for approval.
 
         Returns:
-            dict: A dictionary with the status and message.
+            dict: A dictionary with the status and booking_info.
 
         Example:
-            book_parking_space(
+            submit_booking_request(
                 booking_info=BookingInfo(
-                    name="John Smith"
+                    name="John Smith",
                     license_plate="ABC123",
-                    start_datetime=datetime.datetime(2025, 6, 7, 15, 00, 00),
-                    end_datetime=datetime.datetime(2025, 6, 7, 16, 00, 00),
+                    start_datetime=datetime.datetime(2025, 6, 7, 15, 0, 0),
+                    end_datetime=datetime.datetime(2025, 6, 7, 16, 0, 0),
                     spot_number=15
                 )
             )
             {
-                'status': 'success',
-                'message': '"Booking confirmed by admin.'
-                'booking_info': booking_info
+                'status': 'ready_for_admin',
+                'message': 'Booking request submitted. Waiting for admin approval.',
+                'booking_info': { ... }
             }
     """
     if booking_info.check_if_all_fields_present():
-        # Notify admin by creating an escalation task in the admin API
-        payload = {
-            "booking": {
-                "name": booking_info.name,
-                "license_plate": booking_info.license_plate,
-                "start_datetime": booking_info.start_datetime.isoformat() if hasattr(booking_info.start_datetime, 'isoformat') else str(booking_info.start_datetime),
-                "end_datetime": booking_info.end_datetime.isoformat() if hasattr(booking_info.end_datetime, 'isoformat') else str(booking_info.end_datetime),
-                # "spot_number": booking_info.spot_number,
-            },
-            "source": "book_parking_space_tool",
+        return {
+            "status": "ready_for_admin",
+            "message": "Booking request submitted. Waiting for admin approval.",
+            "booking_info": booking_info.model_dump(mode="json"),
         }
-        try:
-            # Create escalation and wait synchronously for admin decision via AdminAgent helper
-            # The AdminAgent method will raise TimeoutError on timeout
-            print("Booking requires admin confirmation, creating escalation task and waiting for resolution...\n")
-
-            # result_task = {'resolution': {'decision': 'confirm', 'notes': 'Looks good, confirming the booking!'}} # Mock result for testing without admin API
-            result_task = _admin_agent.create_task_and_wait(payload)
-
-            # At this point, the admin has resolved the task and result_task contains resolution
-            res = result_task.get('resolution') or {}
-            decision = (res.get('decision') or '').lower()
-            notes = res.get('notes')
-            if decision in ('confirm', 'confirmed'):
-                return {"status": "confirmed", "message": f"Booking confirmed by admin. Notes: {notes or ''}", "booking_info": booking_info}
-            else:
-                return {"status": "refused", "message": f"Booking refused by admin. Notes: {notes or ''}"}
-        except TimeoutError:
-            return {"status": "failure", "message": "Timeout waiting for admin confirmation"}
-        except Exception as e:
-            return {"status": "failure", "message": f"Error creating escalation task or waiting for admin: {str(e)}"}
     else:
         return {
             "status": "failure",
-            "message": "Error booking parking space: Please confirm all the information is present"
+            "message": "Error: Please confirm all the information is present (name, license plate, start time, end time, spot number).",
         }

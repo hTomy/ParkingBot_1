@@ -12,12 +12,14 @@ langchain-mcp-adapters
 langchain-openai
 langchain-core
 langchain
+langgraph>=0.2.0
 fastapi
 uvicorn[standard]
 httpx
 pydantic
 python-dotenv
 pytest
+pytest-asyncio
 requests
 mcp==1.22.0
 fastmcp

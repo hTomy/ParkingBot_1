@@ -222,4 +222,10 @@ Summary of changes
 
 <img src="img/example_usage_task_3.png">
 
+---
+
+# Task 4
+
+### Refactored to graph nodes (usage unchanged)
+
 
