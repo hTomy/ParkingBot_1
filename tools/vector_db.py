@@ -8,7 +8,7 @@ from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.vector_stores.weaviate import WeaviateVectorStore
 from utils import config
 
-def build_llamaindex_retriever():
+def build_llamaindex_retriever(k=4):
     Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 
     client = weaviate.connect_to_local()
@@ -19,7 +19,7 @@ def build_llamaindex_retriever():
     )
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
     index = VectorStoreIndex.from_vector_store(vector_store, storage_context=storage_context)
-    retriever = index.as_retriever(similarity_top_k=4)
+    retriever = index.as_retriever(similarity_top_k=k)
 
     return client, retriever
 

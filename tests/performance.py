@@ -28,7 +28,7 @@ def eval_retriever(retriever, eval_set, k=5, id_getter=None):
         latencies.append((time.perf_counter() - t0) * 1000)
 
         retrieved_ids = [n.node.node_id for n in nodes]
-
+        print(f"query: {ex["query"]}\nRetrieved passages:\n\t-{"\n\t-".join([n.node.text for n in nodes])}\n{'*'*20}\n\n")
         relevant_ids = ex["relevant_ids"]
         precisions.append(precision_at_k(retrieved_ids, relevant_ids, k))
         recalls.append(recall_at_k(retrieved_ids, relevant_ids, k))
@@ -43,19 +43,22 @@ def eval_retriever(retriever, eval_set, k=5, id_getter=None):
 
 
 if __name__ == '__main__':
-    wclient, retriever = build_llamaindex_retriever()
+    k = 2
+    wclient, retriever = build_llamaindex_retriever(k=k)
 
     eval_set = [
       {"query_id": "q1", "query": "What are the opening hours of the parking?",
-       "relevant_ids": {"afe8dd6d-e031-4281-8795-d264938b21ef", "c36cbc6d-a7ec-445f-beba-e36f2b632b6a"}},
+       "relevant_ids": {"6772c296-22c0-4e08-9809-081b5242d66a", "cc7dfe38-6819-474a-a867-eaef4370c695"}},
       {"query_id": "q2", "query": "What are the prices?",
-       "relevant_ids": {"5b826523-9c42-46b3-aed0-3f1356afde8b", "6795f87f-1b55-4a9e-bb9d-d9e11da1fad7"}},
+       "relevant_ids": {"58cce618-938c-44aa-9a0d-26dbf93f0648", "eb397d30-4e4c-4dc0-9468-0070649705a0"}},
+      {"query_id": "q2", "query": "What is the location of the parking?",
+       "relevant_ids": {"1b51a0e9-e64c-480e-bb09-1c64da2740c7", "2b77119e-537b-41b6-bf53-f792661d2abb"}},
     ]
 
     results = eval_retriever(
         retriever,
         eval_set,
-        k=2
+        k=k
     )
 
     wclient.close()
