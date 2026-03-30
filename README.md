@@ -191,7 +191,7 @@ $body = @{
 } | ConvertTo-Json
 
 Invoke-RestMethod `
-  -Uri "http://localhost:8001/tasks/task_id/resolve" `
+  -Uri "http://localhost:8001/tasks/d2c5fe78-9e56-4785-a545-bb8bbb296ac4/resolve" `
   -Method POST `
   -ContentType "application/json" `
   -Body $body
