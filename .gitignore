@@ -1,5 +1,4 @@
 .env
 .idea
 __pycache__
-/db_setup/pgdata
-/db_setup/weaviate_data
+/pgdata
